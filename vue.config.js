@@ -27,13 +27,13 @@ module.exports = {
     config.resolve.alias.set('@', resolve('src'))
 
     // 全局注册
-    config.externals({
-      vue: 'Vue',
-      'vue-router': 'VueRouter',
-      vuex: 'Vuex',
-      axios: 'axios',
-      'element-ui': 'Element'
-    })
+    // config.externals({
+    //   vue: 'Vue',
+    //   'vue-router': 'VueRouter',
+    //   vuex: 'Vuex',
+    //   axios: 'axios',
+    //   'element-ui': 'Element'
+    // })
 
     config.devtool('source-map')
   },
