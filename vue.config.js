@@ -1,4 +1,6 @@
 const path = require('path')
+const webpack = require('webpack')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const { name } = require('./package.json')
 
 function resolve (dir) {
@@ -26,7 +28,7 @@ module.exports = {
     config.plugins.delete('prefetch')
     config.resolve.alias.set('@', resolve('src'))
 
-    // 全局注册
+    // externals功能 将静态资源放在CDN上 打包时不会打包至bundle 而是在运行时动态获取
     // config.externals({
     //   vue: 'Vue',
     //   'vue-router': 'VueRouter',
@@ -37,12 +39,25 @@ module.exports = {
 
     config.devtool('source-map')
   },
-  configureWebpack: (config) => {
-    // 生产环境去掉 console debugger
-    if (isProd) {
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
-      config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = true
-    }
+  configureWebpack: {
+    plugins: [
+      new webpack.DllReferencePlugin({
+        context: process.cwd(),
+        manifest: require('./public/vendor/vendor-manifest.json')
+      }),
+      // 打包时去掉debugger console
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            drop_debugger: true, //debugger
+            drop_console: true,// console
+            pure_funcs: ['console.log'] // 移除console
+          },
+        },
+        sourceMap: false,
+        parallel: true,
+      })
+    ]
   },
 
   // 打包后不生成map文件，减少包体积
